@@ -1,7 +1,8 @@
 import { Button } from "../components/Button";
-import { profile } from "../data/portfolio";
+import { usePortfolio } from "../context/PortfolioContext";
 
 export function Contact() {
+  const { content: { profile } } = usePortfolio();
   return (
     <section id="contact" className="section-pad flex min-h-[calc(100svh-5rem)] items-center">
       <div className="mx-auto max-w-5xl px-5 text-center sm:px-6 lg:px-8">

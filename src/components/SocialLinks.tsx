@@ -1,13 +1,9 @@
 import { Github, Linkedin, Mail } from "lucide-react";
-import { profile } from "../data/portfolio";
-
-const links = [
-  { label: "GitHub", href: profile.github, Icon: Github },
-  { label: "LinkedIn", href: profile.linkedin, Icon: Linkedin },
-  { label: "Email", href: `mailto:${profile.email}`, Icon: Mail },
-];
+import { usePortfolio } from "../context/PortfolioContext";
 
 export function SocialLinks({ compact = false }: { compact?: boolean }) {
+  const { content: { profile } } = usePortfolio();
+  const links = [{ label: "GitHub", href: profile.github, Icon: Github }, { label: "LinkedIn", href: profile.linkedin, Icon: Linkedin }, { label: "Email", href: `mailto:${profile.email}`, Icon: Mail }];
   return (
     <div className="flex flex-wrap items-center gap-3">
       {links.map(({ label, href, Icon }) => (

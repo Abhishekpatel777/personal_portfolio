@@ -6,6 +6,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Space Grotesk", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       colors: {
@@ -18,8 +19,8 @@ export default {
         accent: "rgb(var(--accent) / <alpha-value>)",
       },
       boxShadow: {
-        premium: "0 24px 80px rgba(0, 0, 0, 0.32)",
-        glow: "0 0 0 1px rgba(93, 176, 255, 0.18), 0 20px 70px rgba(93, 176, 255, 0.08)",
+        premium: "0 24px 80px rgb(var(--shadow-color) / var(--shadow-opacity))",
+        glow: "0 0 0 1px rgb(var(--accent) / 0.2), 0 24px 80px rgb(var(--accent) / 0.14)",
       },
     },
   },
