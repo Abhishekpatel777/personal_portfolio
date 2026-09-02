@@ -79,7 +79,7 @@ export function Navbar() {
           </button>
         </div>
       </nav>
-      <div className={`md:hidden ${isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"} transition duration-200`}>
+      {isOpen && <div className="md:hidden">
         <div className="mx-4 mb-4 rounded-2xl border border-border bg-surface/95 p-3 shadow-premium backdrop-blur-xl">
           {navItems.map((item) => (
             <a
@@ -95,7 +95,7 @@ export function Navbar() {
             Resume
           </a>
         </div>
-      </div>
+      </div>}
       <button
         type="button"
         data-aegis-control
