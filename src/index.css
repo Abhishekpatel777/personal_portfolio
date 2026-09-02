@@ -2058,6 +2058,28 @@ article {
   }
 }
 
+@media (max-width: 767px) {
+  /* Directional scroll reveals can clip content at narrow viewport edges and
+     leave below-the-fold content invisible after anchor navigation. */
+  .scroll-reveal,
+  .scroll-reveal.is-scroll-visible,
+  #about .max-w-3xl > p.scroll-reveal,
+  #experience article.scroll-reveal,
+  #projects article.scroll-reveal,
+  #education article.scroll-reveal {
+    opacity: 1 !important;
+    translate: none !important;
+    rotate: 0deg !important;
+    scale: 1 !important;
+    transition: none !important;
+  }
+
+  .hero-scroll-visual,
+  #projects img {
+    transform: none;
+  }
+}
+
 @layer components {
   .admin-overlay {
     @apply fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm;
