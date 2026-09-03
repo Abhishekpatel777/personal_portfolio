@@ -618,6 +618,8 @@ body {
 @keyframes arcane-steam-rise { 0% { transform: translateY(9px) scale(.7); opacity: 0; } 35% { opacity: .6; } 100% { transform: translate(6px,-23px) scale(1.25); opacity: 0; } }
 
 @media (max-width: 767px) {
+  .arcane-atmosphere { contain: strict; }
+  #skills article.arcane-hat-card::after { display: none; }
   .arcane-cursor-aura,
   .arcane-quill,
   .arcane-rune-orbit,
@@ -629,7 +631,7 @@ body {
   .arcane-floating-book { right: -18px; bottom: 10vh; scale: .72; }
   .arcane-potion { left: 12px; bottom: 14vh; scale: .78; }
   .arcane-winged-key { right: 4px; width: 82px; }
-  .arcane-wand { left: auto; right: 7px; top: 21vh; width: 96px; }
+  .arcane-wand { left: auto; right: 7px; top: 21vh; width: 96px; overflow: hidden; }
   .arcane-witch-hat { left: -10px; top: 72vh; scale: .72; }
   .arcane-crystal-ball { right: 7px; bottom: 14vh; scale: .72; }
 }
