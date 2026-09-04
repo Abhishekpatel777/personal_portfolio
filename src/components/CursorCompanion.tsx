@@ -111,11 +111,9 @@ export function CursorCompanion() {
   }, [isArcane]);
 
   useEffect(() => {
-    const finePointer = window.matchMedia("(pointer: fine)");
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setEnabled(finePointer.matches && !reducedMotion.matches && window.innerWidth >= 768);
-    update(); finePointer.addEventListener("change", update); reducedMotion.addEventListener("change", update); window.addEventListener("resize", update);
-    return () => { finePointer.removeEventListener("change", update); reducedMotion.removeEventListener("change", update); window.removeEventListener("resize", update); };
+    // Keep the guide controls, but avoid the permanent cursor-following RAF loop.
+    // This substantially reduces main-thread and compositing work while scrolling.
+    setEnabled(false);
   }, []);
 
   useEffect(() => {
