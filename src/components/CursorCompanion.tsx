@@ -74,7 +74,6 @@ export function CursorCompanion() {
   const voiceRequestId = useRef(0);
   const lastScrollY = useRef(0);
   const blastId = useRef(0);
-  const lastBroomStar = useRef({ x: 240, y: 70, time: 0 });
   const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || "dark");
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [parked, setParked] = useState(false);
@@ -111,9 +110,18 @@ export function CursorCompanion() {
   }, [isArcane]);
 
   useEffect(() => {
-    // Keep the guide controls, but avoid the permanent cursor-following RAF loop.
-    // This substantially reduces main-thread and compositing work while scrolling.
-    setEnabled(false);
+    const finePointer = window.matchMedia("(pointer: fine)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setEnabled(finePointer.matches && !reducedMotion.matches && window.innerWidth >= 768);
+    update();
+    finePointer.addEventListener("change", update);
+    reducedMotion.addEventListener("change", update);
+    window.addEventListener("resize", update);
+    return () => {
+      finePointer.removeEventListener("change", update);
+      reducedMotion.removeEventListener("change", update);
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   useEffect(() => {
@@ -250,24 +258,6 @@ export function CursorCompanion() {
         setDirection("landing");
       }
       if (companionRef.current) companionRef.current.style.transform = `translate3d(${position.current.x - (isArcane ? 94 : 44)}px, ${position.current.y - (isArcane ? 62 : 52)}px, 0)`;
-      if (isArcane && !parked && broomTrailRef.current) {
-        const now = performance.now();
-        const traveled = Math.hypot(position.current.x - lastBroomStar.current.x, position.current.y - lastBroomStar.current.y);
-        if (traveled > 4 && now - lastBroomStar.current.time > 72) {
-          const star = document.createElement("i");
-          star.className = "arcane-broom-star";
-          star.textContent = Math.random() > .45 ? "✦" : "✧";
-          star.style.left = `${position.current.x - 84 + (Math.random() - .5) * 14}px`;
-          star.style.top = `${position.current.y + 32 + (Math.random() - .5) * 12}px`;
-          star.style.setProperty("--star-drift", `${-22 - Math.random() * 28}px`);
-          star.style.setProperty("--star-fall", `${10 + Math.random() * 22}px`);
-          star.style.setProperty("--star-turn", `${Math.round((Math.random() - .5) * 220)}deg`);
-          star.style.setProperty("--star-size", `${7 + Math.random() * 7}px`);
-          broomTrailRef.current.appendChild(star);
-          window.setTimeout(() => star.remove(), 1050);
-          lastBroomStar.current = { x: position.current.x, y: position.current.y, time: now };
-        }
-      }
       frame.current = requestAnimationFrame(animate);
     }
     window.addEventListener("pointermove", move, { passive: true });
