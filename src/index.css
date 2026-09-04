@@ -618,7 +618,7 @@ body {
 @keyframes arcane-steam-rise { 0% { transform: translateY(9px) scale(.7); opacity: 0; } 35% { opacity: .6; } 100% { transform: translate(6px,-23px) scale(1.25); opacity: 0; } }
 
 @media (max-width: 767px) {
-  .arcane-atmosphere { display: none; }
+  .arcane-atmosphere { contain: strict; }
   #skills article.arcane-hat-card::after { display: none; }
   .arcane-cursor-aura,
   .arcane-quill,
@@ -634,10 +634,6 @@ body {
   .arcane-wand { left: auto; right: 7px; top: 21vh; width: 96px; overflow: hidden; }
   .arcane-witch-hat { left: -10px; top: 72vh; scale: .72; }
   .arcane-crystal-ball { right: 7px; bottom: 14vh; scale: .72; }
-}
-
-@media (max-width: 1024px) {
-  .scroll-aurora { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2065,32 +2061,6 @@ article {
 }
 
 @media (max-width: 767px) {
-  .scroll-progress-track { display: none; }
-
-  .appearance-controller {
-    position: absolute !important;
-  }
-
-  .arcane-atmosphere *,
-  .arcane-card-hat,
-  .arcane-card-hat *,
-  .marquee-track,
-  .status-pulse {
-    animation: none !important;
-  }
-
-  .glass-panel,
-  .appearance-controller,
-  .aivon-mobile-welcome,
-  .admin-fab,
-  .backdrop-blur,
-  .backdrop-blur-xl,
-  header,
-  [data-aegis-control] {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
   /* Directional scroll reveals can clip content at narrow viewport edges and
      leave below-the-fold content invisible after anchor navigation. */
   .scroll-reveal,
@@ -2110,40 +2080,6 @@ article {
   #projects img {
     transform: none;
   }
-}
-
-/* Performance-first rendering: preserve the theme design while avoiding
-   continuously composited blur, parallax, and decorative animation layers. */
-.scroll-aurora,
-.scroll-progress-track,
-.arcane-atmosphere {
-  display: none !important;
-}
-
-.glass-panel,
-.appearance-controller,
-.aivon-intro,
-.aivon-mobile-welcome,
-.admin-fab,
-.backdrop-blur,
-.backdrop-blur-md,
-.backdrop-blur-xl,
-.backdrop-blur-2xl,
-header,
-[data-aegis-control],
-[data-aegis-control] * {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-.arcane-card-hat,
-.arcane-card-hat *,
-.aegis-companion,
-.marquee-track,
-.status-pulse,
-.reveal,
-.section-heading {
-  animation: none !important;
 }
 
 @layer components {

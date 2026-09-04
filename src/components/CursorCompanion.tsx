@@ -74,6 +74,7 @@ export function CursorCompanion() {
   const voiceRequestId = useRef(0);
   const lastScrollY = useRef(0);
   const blastId = useRef(0);
+  const lastBroomStar = useRef({ x: 240, y: 70, time: 0 });
   const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || "dark");
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [parked, setParked] = useState(false);
@@ -183,11 +184,18 @@ export function CursorCompanion() {
 
   useEffect(() => {
     if (!enabled) return;
+    let animating = false;
+    function requestAnimate() {
+      if (animating) return;
+      animating = true;
+      frame.current = requestAnimationFrame(animate);
+    }
     function move(event: PointerEvent) {
       if (parked) return;
       cursorTarget.current = { x: event.clientX + 58, y: event.clientY - 58 };
       if (scrollInProgress.current || teleportActive.current) return;
       target.current = cursorTarget.current;
+      requestAnimate();
     }
     function blast(event: PointerEvent) {
       if (parked || (event.target instanceof Element && event.target.closest("[data-aegis-control]"))) return;
@@ -219,12 +227,14 @@ export function CursorCompanion() {
         position.current = { ...arrival };
         target.current = { ...arrival };
         setTeleportPhase("arrive");
+        requestAnimate();
       }, 230);
       teleportEndTimer.current = window.setTimeout(() => {
         teleportActive.current = false;
         setTeleportPhase("idle");
         setPortalPosition(null);
         target.current = { ...cursorTarget.current };
+        requestAnimate();
       }, 1050);
     }
     function isFullyOutsideViewport() {
@@ -241,13 +251,17 @@ export function CursorCompanion() {
       teleportPending.current = true;
       position.current.y -= delta;
       target.current = { ...position.current };
+      requestAnimate();
       window.clearTimeout(scrollStopTimer.current);
       scrollStopTimer.current = window.setTimeout(() => {
         scrollInProgress.current = false;
         if (!teleportPending.current) return;
         teleportPending.current = false;
         if (isFullyOutsideViewport()) triggerTeleport();
-        else target.current = { ...cursorTarget.current };
+        else {
+          target.current = { ...cursorTarget.current };
+          requestAnimate();
+        }
       }, 220);
     }
     function animate() {
@@ -258,13 +272,33 @@ export function CursorCompanion() {
         setDirection("landing");
       }
       if (companionRef.current) companionRef.current.style.transform = `translate3d(${position.current.x - (isArcane ? 94 : 44)}px, ${position.current.y - (isArcane ? 62 : 52)}px, 0)`;
-      frame.current = requestAnimationFrame(animate);
+      if (isArcane && !parked && broomTrailRef.current) {
+        const now = performance.now();
+        const traveled = Math.hypot(position.current.x - lastBroomStar.current.x, position.current.y - lastBroomStar.current.y);
+        if (traveled > 4 && now - lastBroomStar.current.time > 72) {
+          const star = document.createElement("i");
+          star.className = "arcane-broom-star";
+          star.textContent = Math.random() > .45 ? "✦" : "✧";
+          star.style.left = `${position.current.x - 84 + (Math.random() - .5) * 14}px`;
+          star.style.top = `${position.current.y + 32 + (Math.random() - .5) * 12}px`;
+          star.style.setProperty("--star-drift", `${-22 - Math.random() * 28}px`);
+          star.style.setProperty("--star-fall", `${10 + Math.random() * 22}px`);
+          star.style.setProperty("--star-turn", `${Math.round((Math.random() - .5) * 220)}deg`);
+          star.style.setProperty("--star-size", `${7 + Math.random() * 7}px`);
+          broomTrailRef.current.appendChild(star);
+          window.setTimeout(() => star.remove(), 1050);
+          lastBroomStar.current = { x: position.current.x, y: position.current.y, time: now };
+        }
+      }
+      const distance = Math.hypot(target.current.x - position.current.x, target.current.y - position.current.y);
+      if (distance > .5 || scrollInProgress.current || teleportActive.current) frame.current = requestAnimationFrame(animate);
+      else animating = false;
     }
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerdown", blast, { passive: true });
     lastScrollY.current = window.scrollY;
     window.addEventListener("scroll", detectScrollJump, { passive: true });
-    frame.current = requestAnimationFrame(animate);
+    requestAnimate();
     return () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerdown", blast); window.removeEventListener("scroll", detectScrollJump); window.clearTimeout(scrollStopTimer.current); window.clearTimeout(teleportTimer.current); window.clearTimeout(teleportEndTimer.current); cancelAnimationFrame(frame.current); broomTrailRef.current?.replaceChildren(); };
   }, [enabled, parked, isArcane]);
 
