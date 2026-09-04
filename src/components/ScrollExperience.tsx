@@ -33,6 +33,8 @@ export function ScrollExperience() {
     const sectionElements = sections.map(({ id }) => document.getElementById(id)).filter((section): section is HTMLElement => Boolean(section));
     const registeredElements = new Set<HTMLElement>();
     let animationFrame = 0;
+    let scrollEndTimer = 0;
+    let lastEffectUpdate = 0;
     let currentSection = "top";
     let visibilityFallback = 0;
 
@@ -70,8 +72,13 @@ export function ScrollExperience() {
       });
     };
 
-    const updateScrollEffects = () => {
+    const updateScrollEffects = (timestamp = performance.now()) => {
       animationFrame = 0;
+      if (timestamp - lastEffectUpdate < 32) {
+        animationFrame = window.requestAnimationFrame(updateScrollEffects);
+        return;
+      }
+      lastEffectUpdate = timestamp;
       const viewportHeight = window.innerHeight;
       const maximumScroll = Math.max(document.documentElement.scrollHeight - viewportHeight, 1);
       const scrollProgress = Math.min(Math.max(window.scrollY / maximumScroll, 0), 1);
@@ -87,6 +94,9 @@ export function ScrollExperience() {
     };
 
     const requestUpdate = () => {
+      document.documentElement.classList.add("is-scrolling");
+      window.clearTimeout(scrollEndTimer);
+      scrollEndTimer = window.setTimeout(() => document.documentElement.classList.remove("is-scrolling"), 140);
       if (!animationFrame) animationFrame = window.requestAnimationFrame(updateScrollEffects);
     };
 
@@ -113,10 +123,12 @@ export function ScrollExperience() {
       sectionObserver.disconnect();
       mutationObserver.disconnect();
       window.clearTimeout(visibilityFallback);
+      window.clearTimeout(scrollEndTimer);
       window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", requestUpdate);
       window.cancelAnimationFrame(animationFrame);
       document.documentElement.style.removeProperty("--page-scroll");
+      document.documentElement.classList.remove("is-scrolling");
       delete document.documentElement.dataset.activeSection;
       sectionElements.forEach(section => {
         section.style.removeProperty("--section-travel");

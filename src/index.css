@@ -792,6 +792,7 @@ article {
   z-index: -1;
   overflow: visible;
   pointer-events: none;
+  contain: strict;
 }
 
 .scroll-aurora i {
@@ -2080,6 +2081,30 @@ article {
   #projects img {
     transform: none;
   }
+}
+
+/* Rendering optimizations that preserve the complete visual design. Off-screen
+   sections are skipped until they approach the viewport, and continuous
+   decorative animations pause briefly while the page itself is moving. */
+@supports (content-visibility: auto) {
+  main > section:not(#top) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 900px;
+  }
+}
+
+.glass-panel,
+article {
+  backface-visibility: hidden;
+}
+
+.is-scrolling .arcane-atmosphere *,
+.is-scrolling .aegis-companion,
+.is-scrolling .marquee-track,
+.is-scrolling .status-pulse,
+.is-scrolling #education article::after,
+.is-scrolling #contact h2 {
+  animation-play-state: paused !important;
 }
 
 @layer components {
