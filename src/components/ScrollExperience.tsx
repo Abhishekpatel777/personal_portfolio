@@ -30,6 +30,14 @@ export function ScrollExperience() {
   const [activeSection, setActiveSection] = useState("top");
 
   useEffect(() => {
+    const lightweightMotion = window.matchMedia("(max-width: 767px), (prefers-reduced-motion: reduce)").matches;
+    if (lightweightMotion) {
+      document.documentElement.dataset.motion = "lightweight";
+      return () => {
+        delete document.documentElement.dataset.motion;
+      };
+    }
+
     const sectionElements = sections.map(({ id }) => document.getElementById(id)).filter((section): section is HTMLElement => Boolean(section));
     const registeredElements = new Set<HTMLElement>();
     let animationFrame = 0;
@@ -114,6 +122,7 @@ export function ScrollExperience() {
       window.removeEventListener("resize", requestUpdate);
       window.cancelAnimationFrame(animationFrame);
       document.documentElement.style.removeProperty("--page-scroll");
+      delete document.documentElement.dataset.motion;
       delete document.documentElement.dataset.activeSection;
       sectionElements.forEach(section => {
         section.style.removeProperty("--section-travel");
